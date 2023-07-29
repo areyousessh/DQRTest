@@ -1,0 +1,61 @@
+// This is your Prisma schema file,
+// learn more about it in the docs: https://pris.ly/d/prisma-schema
+
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "mongodb"
+  url      = env("DATABASE_URL")
+}
+
+
+model Knight {
+  id            String   @id @default(uuid()) @map("_id")
+  name          String
+  nickname      String
+  birthday      String
+  keyAttribute  String
+  attributes    Attributes?
+  weapons       Weapon[]
+
+
+  @@map("knight")
+}
+
+model Attributes {
+  id            String  @id @default(uuid()) @map("_id")
+  strength      Int
+  dexterity     Int
+  constitution  Int
+  intelligence  Int
+  wisdom        Int
+  charisma      Int
+  knight        Knight  @relation(fields: [knightId], references: [id])
+  knightId      String @unique
+
+  @@map("attributes")
+}
+
+model Weapon {
+  id        String  @id @default(uuid()) @map("_id")
+  name      String
+  mod       Int
+  attr      String
+  equipped  Boolean
+  knight    Knight  @relation(fields: [knightId], references: [id])
+  knightId  String
+
+  @@map("weapon")
+}
+
+model Hero {
+  id         String  @id @default(uuid()) @map("_id")
+  knightId String
+  groupName  String
+
+  @@map("hero")
+}
+
+
