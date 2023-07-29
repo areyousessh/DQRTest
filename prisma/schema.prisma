@@ -32,8 +32,8 @@ model Attributes {
   intelligence  Int
   wisdom        Int
   charisma      Int
-  knight        Knight  @relation(fields: [knightId], references: [id])
-  knightId      String @unique
+  knight        Knight?  @relation(fields: [knightId], references: [id])
+  knightId      String?  @unique
 
   @@map("attributes")
 }
@@ -44,14 +44,15 @@ model Weapon {
   mod       Int
   attr      String
   equipped  Boolean
-  knight    Knight  @relation(fields: [knightId], references: [id])
-  knightId  String
+  knight    Knight?  @relation(fields: [knightId], references: [id])
+  knightId  String?
 
   @@map("weapon")
 }
 
 model Hero {
   id         String  @id @default(uuid()) @map("_id")
+  knightName String
   knightId String
   groupName  String
 

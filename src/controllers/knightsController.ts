@@ -93,3 +93,66 @@ export class updateKnightNickname {
         }
     }
 }
+
+export class deleteKnightController {
+    async handle (req: Request, res: Response) {
+        const { id } = req.params;
+
+  try {
+    const knight = await prismaClient.knight.findUnique({
+      where: {
+        id,
+      },
+      include: {
+        attributes: true,
+        weapons: true,
+      },
+    });
+
+    if (!knight) {
+      return res.status(404).json({ error: 'Knight not found' });
+    }
+
+    await prismaClient.knight.delete({
+      where: {
+        id,
+      },
+      include: {
+        attributes: true,
+        weapons: true,
+      },
+    });
+
+    const hero = await prismaClient.hero.create({
+      data: {
+        knightId: knight.id,
+        knightName: knight.name,
+        groupName: 'Hall of Heroes',
+      },
+    });
+
+    res.status(200).json({ message: 'Cavaleiro deletado e adicionado ao Hall of Heroes', hero });
+  } catch (error) {
+    console.error('Erro ao deletar o cavaleiro e adiciona-lo ao Hall of Heroes:', error);
+    res.status(500).json({ error: 'Erro interno do servidor' });
+  }
+    }
+}
+
+export class getHallOfHeroes {
+    async handle (req: Request, res: Response) {
+        try {
+            const knightsInHallOfHeroes = await prismaClient.hero.findMany({
+                where: {
+                    groupName: 'Hall of Heroes',
+                },
+            });
+            res.status(200).json(knightsInHallOfHeroes);
+        } catch (e: any) {
+            console.log(e, 'Erro os buscar o Hall of Heroes')
+            res.status(500).json({
+                e: 'Erro interno no servidor'
+            })
+        }
+    }
+}
